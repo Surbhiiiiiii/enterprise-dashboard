@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { apiRunAnalysis } from "../api";
 import { motion, AnimatePresence } from "framer-motion";
 
-const ACCEPTED_TYPES = ".csv,.json,.txt,.pdf,.xlsx,.xls,text/csv,application/json,text/plain,application/pdf";
+
 
 const PHASES = [
   { label: "Planner",  icon: "🧠", color: "#38bdf8", desc: "Formulating strategy..." },
@@ -16,7 +16,7 @@ const AnalysisPanel = ({ setResult, user, setLiveStatus, setLiveLogs }) => {
   const [url, setUrl] = useState("");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [dots, setDots] = useState("");
   const fileInputRef = useRef(null);
@@ -44,13 +44,13 @@ const AnalysisPanel = ({ setResult, user, setLiveStatus, setLiveLogs }) => {
   if (!canRunAI) return null;
 
   const handleRun = async () => {
-    setError("");
+    setErrorMsg("");
     if (!goal.trim() && !file && !url.trim()) {
-      setError("Please provide an analysis goal, upload a dataset, or enter a URL.");
+      setErrorMsg("Please provide an analysis goal, upload a dataset, or enter a URL.");
       return;
     }
     if (!goal.trim()) {
-      setError("Please provide an analysis goal describing what to investigate.");
+      setErrorMsg("Please provide an analysis goal describing what to investigate.");
       return;
     }
 
@@ -67,7 +67,7 @@ const AnalysisPanel = ({ setResult, user, setLiveStatus, setLiveLogs }) => {
       const data = await apiRunAnalysis(formData);
       setResult(data);
     } catch (err) {
-      setError(err.message || "Analysis failed. Check backend logs.");
+      setErrorMsg(err.message || "Analysis failed. Check backend logs.");
     } finally {
       setLoading(false);
     }
@@ -80,9 +80,9 @@ const AnalysisPanel = ({ setResult, user, setLiveStatus, setLiveLogs }) => {
     const validExts = ["csv", "json", "txt", "pdf", "xlsx", "xls"];
     if (validExts.includes(ext)) {
       setFile(selected);
-      setError("");
+      setErrorMsg("");
     } else {
-      setError("Unsupported file type. Accepted: CSV, JSON, Excel, PDF, TXT.");
+      setErrorMsg("Unsupported file type. Accepted: CSV, JSON, Excel, PDF, TXT.");
     }
   };
 

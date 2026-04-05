@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FaBrain, FaBolt, FaHistory, FaCheckCircle, FaChartBar } from "react-icons/fa";
+import { FaBrain, FaBolt, FaCheckCircle, FaChartBar } from "react-icons/fa";
 
 function MetaInsightsPanel({ metaInsights }) {
   if (!metaInsights) {

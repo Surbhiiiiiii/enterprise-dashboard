@@ -70,7 +70,10 @@ function App() {
 
     let reconnectTimer;
     const connectWebSocket = () => {
-      ws.current = new WebSocket("ws://localhost:8000/ws");
+      const wsBase = (process.env.REACT_APP_API_URL || "http://localhost:8000")
+        .replace(/^https/, "wss")
+        .replace(/^http/, "ws");
+      ws.current = new WebSocket(`${wsBase}/ws`);
 
       ws.current.onmessage = (event) => {
         const data = JSON.parse(event.data);

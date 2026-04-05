@@ -1,5 +1,6 @@
 // API utility with JWT token attachment
-const API_BASE = "http://localhost:8000";
+// In production, set REACT_APP_API_URL in your .env.production or Vercel env vars
+const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 export function getToken() {
   return sessionStorage.getItem("token") || "";

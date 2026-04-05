@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import logo from "../assets/logo.png";
 import {
-  FaBrain, FaBolt, FaShieldAlt, FaChartLine, FaRobot, FaCheckCircle,
+  FaBrain, FaBolt, FaShieldAlt, FaChartLine, FaCheckCircle,
   FaTwitter, FaLinkedin, FaGithub, FaPlay, FaAngleDown, FaStar,
   FaNetworkWired, FaCogs, FaEye, FaUserTie, FaUserSecret
 } from "react-icons/fa";
-import { LineChart, Line, ResponsiveContainer, AreaChart, Area, Tooltip } from "recharts";
+import { ResponsiveContainer, AreaChart, Area, Tooltip } from "recharts";
 
 // ─── Animated Counter ───────────────────────────────────────────────────────
 function Counter({ end, suffix = "", prefix = "" }) {
@@ -828,9 +828,9 @@ export default function LandingPage() {
               <p className="text-xs text-gray-500 leading-relaxed max-w-xs">Self-Evolving Autonomous Enterprise Intelligence System. The future of enterprise operations.</p>
               <div className="flex gap-3 mt-4">
                 {[FaTwitter, FaLinkedin, FaGithub].map((Icon, i) => (
-                  <a key={i} href="#" className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition">
+                  <button key={i} type="button" className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition">
                     <Icon className="text-sm" />
-                  </a>
+                  </button>
                 ))}
               </div>
             </div>
@@ -843,7 +843,7 @@ export default function LandingPage() {
                 <h4 className="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-4">{col.title}</h4>
                 <ul className="space-y-2">
                   {col.links.map((link, j) => (
-                    <li key={j}><a href="#" className="text-sm text-gray-500 hover:text-gray-300 transition">{link}</a></li>
+                    <li key={j}><button type="button" className="text-sm text-gray-500 hover:text-gray-300 transition">{link}</button></li>
                   ))}
                 </ul>
               </div>
@@ -852,9 +852,9 @@ export default function LandingPage() {
           <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-xs text-gray-600">© 2026 SE-AEIS. All rights reserved.</p>
             <div className="flex gap-6 text-xs text-gray-600">
-              <a href="#" className="hover:text-gray-400 transition">Privacy Policy</a>
-              <a href="#" className="hover:text-gray-400 transition">Terms of Service</a>
-              <a href="#" className="hover:text-gray-400 transition">Security</a>
+              <button type="button" className="hover:text-gray-400 transition">Privacy Policy</button>
+              <button type="button" className="hover:text-gray-400 transition">Terms of Service</button>
+              <button type="button" className="hover:text-gray-400 transition">Security</button>
             </div>
           </div>
         </div>

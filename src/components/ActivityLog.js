@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaBrain, FaExclamationTriangle, FaBolt, FaCheckCircle, FaSearch } from "react-icons/fa";
+import { FaExclamationTriangle, FaBolt, FaCheckCircle, FaSearch } from "react-icons/fa";
 
 function ActivityLog({ liveLogs }) {
   const events = liveLogs || [];
