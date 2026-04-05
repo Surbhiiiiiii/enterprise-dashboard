@@ -1,13 +1,56 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-['Inter'] text-gray-200 antialiased bg-dark-bg min-h-screen relative;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@layer components {
+  .glass-panel {
+    @apply bg-dark-surface backdrop-blur-xl border border-dark-border rounded-2xl shadow-xl shadow-ai-blue/10;
+  }
+  
+  .glass-panel-hover {
+    @apply glass-panel transition-all duration-300 hover:border-ai-cyan/40 hover:shadow-ai-cyan/20;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500;
+  }
+}
+
+/* Animated animated cyber grid background */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  background-image: 
+    linear-gradient(to right, rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+}
+
+/* Subtle glowing orb in background */
+body::after {
+  content: "";
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60vw;
+  height: 60vh;
+  background: radial-gradient(circle, rgba(56,189,248,0.05) 0%, rgba(5,11,20,0) 70%);
+  z-index: -2;
+  pointer-events: none;
+  border-radius: 50%;
 }
