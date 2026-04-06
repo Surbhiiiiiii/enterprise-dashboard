@@ -2,6 +2,31 @@
 // In production, set REACT_APP_API_URL in your .env.production or Vercel env vars
 const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
+/**
+ * Retries a fetch call up to `retries` times on network failure (e.g. Render cold start).
+ * Waits `delayMs` ms between attempts and calls onRetry(attempt) before each retry.
+ */
+async function fetchWithRetry(url, options = {}, retries = 3, delayMs = 5000, onRetry = null) {
+  for (let attempt = 1; attempt <= retries + 1; attempt++) {
+    try {
+      return await fetch(url, options);
+    } catch (err) {
+      const isNetworkError = err instanceof TypeError && err.message === "Failed to fetch";
+      if (isNetworkError && attempt <= retries) {
+        if (onRetry) onRetry(attempt);
+        await new Promise((res) => setTimeout(res, delayMs));
+      } else {
+        if (isNetworkError) {
+          throw new Error(
+            "Cannot reach the server. It may be starting up — please wait a moment and try again."
+          );
+        }
+        throw err;
+      }
+    }
+  }
+}
+
 export function getToken() {
   return sessionStorage.getItem("token") || "";
 }
@@ -26,45 +51,45 @@ export function clearSession() {
 }
 
 // ── Auth API ─────────────────────────────────────────────────────────────────
-export async function apiRegister(data) {
-  const res = await fetch(`${API_BASE}/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+export async function apiRegister(data, onRetry) {
+  const res = await fetchWithRetry(
+    `${API_BASE}/auth/register`,
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) },
+    3, 5000, onRetry
+  );
   const json = await res.json();
   if (!res.ok) throw new Error(json.detail || "Registration failed");
   return json;
 }
 
-export async function apiVerifyOtp(email, otp) {
-  const res = await fetch(`${API_BASE}/auth/verify-otp`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, otp }),
-  });
+export async function apiVerifyOtp(email, otp, onRetry) {
+  const res = await fetchWithRetry(
+    `${API_BASE}/auth/verify-otp`,
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, otp }) },
+    3, 5000, onRetry
+  );
   const json = await res.json();
   if (!res.ok) throw new Error(json.detail || "OTP verification failed");
   return json;
 }
 
-export async function apiResendOtp(email) {
-  const res = await fetch(`${API_BASE}/auth/resend-otp`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  });
+export async function apiResendOtp(email, onRetry) {
+  const res = await fetchWithRetry(
+    `${API_BASE}/auth/resend-otp`,
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) },
+    3, 5000, onRetry
+  );
   const json = await res.json();
   if (!res.ok) throw new Error(json.detail || "Resend failed");
   return json;
 }
 
-export async function apiLogin(username, password) {
-  const res = await fetch(`${API_BASE}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
+export async function apiLogin(username, password, onRetry) {
+  const res = await fetchWithRetry(
+    `${API_BASE}/auth/login`,
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password }) },
+    3, 5000, onRetry
+  );
   const json = await res.json();
   if (!res.ok) throw new Error(json.detail || "Login failed");
   return json;

@@ -11,6 +11,7 @@ function RegisterPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState("register"); // "register" | "otp"
   const [loading, setLoading] = useState(false);
+  const [wakingUp, setWakingUp] = useState("");
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [registeredEmail, setRegisteredEmail] = useState("");
@@ -32,23 +33,29 @@ function RegisterPage() {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
+    setWakingUp("");
     if (form.password !== form.confirm) {
       setError("Passwords do not match.");
       return;
     }
     setLoading(true);
     try {
-      const res = await apiRegister({
-        username: form.username,
-        email: form.email,
-        phone: form.phone,
-        password: form.password,
-        role: form.role,
-      });
+      const res = await apiRegister(
+        {
+          username: form.username,
+          email: form.email,
+          phone: form.phone,
+          password: form.password,
+          role: form.role,
+        },
+        (attempt) => setWakingUp(`⏳ Server is waking up... (attempt ${attempt}/3, please wait)`)
+      );
+      setWakingUp("");
       setRegisteredEmail(form.email);
       setSuccessMsg(res.message || "OTP sent to your email.");
       setStep("otp");
     } catch (err) {
+      setWakingUp("");
       setError(err.message);
     } finally {
       setLoading(false);
@@ -109,8 +116,20 @@ function RegisterPage() {
           </p>
         </div>
 
-        {/* Error / Success */}
+        {/* Error / Success / Waking Up */}
         <AnimatePresence>
+          {wakingUp && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="mb-4 px-4 py-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-300 text-sm flex items-center gap-2"
+            >
+              <svg className="animate-spin w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              {wakingUp}
+            </motion.div>
+          )}
           {error && (
             <motion.div
               initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
@@ -173,7 +192,15 @@ function RegisterPage() {
               type="submit" disabled={loading}
               className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 py-3.5 rounded-xl font-semibold text-white shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 mt-2 disabled:opacity-60"
             >
-              {loading ? "Creating Account..." : "Create Enterprise Account"}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  {wakingUp ? "Connecting..." : "Creating Account..."}
+                </span>
+              ) : "Create Enterprise Account"}
             </motion.button>
           </form>
         )}

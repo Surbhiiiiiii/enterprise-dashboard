@@ -13,13 +13,20 @@ function LoginPage({ setUser }) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [wakingUp, setWakingUp] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setWakingUp("");
     setLoading(true);
     try {
-      const res = await apiLogin(username.trim(), password);
+      const res = await apiLogin(
+        username.trim(),
+        password,
+        (attempt) => setWakingUp(`⏳ Server is waking up... (attempt ${attempt}/3, please wait)`)
+      );
+      setWakingUp("");
       const token = res.token;
       sessionStorage.setItem("token", token);
 
@@ -33,6 +40,7 @@ function LoginPage({ setUser }) {
       setUser(user);
       navigate("/dashboard");
     } catch (err) {
+      setWakingUp("");
       setError(err.message || "Login failed. Check your credentials.");
     } finally {
       setLoading(false);
@@ -67,8 +75,20 @@ function LoginPage({ setUser }) {
           </p>
         </div>
 
-        {/* Error */}
+        {/* Error / Waking Up */}
         <AnimatePresence>
+          {wakingUp && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="mb-5 px-4 py-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-300 text-sm flex items-center gap-2"
+            >
+              <svg className="animate-spin w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              {wakingUp}
+            </motion.div>
+          )}
           {error && (
             <motion.div
               initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
@@ -114,7 +134,7 @@ function LoginPage({ setUser }) {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Authenticating...
+                {wakingUp ? "Connecting..." : "Authenticating..."}
               </span>
             ) : "Sign In to Enterprise Platform"}
           </motion.button>
