@@ -48,7 +48,7 @@ function RegisterPage() {
           password: form.password,
           role: form.role,
         },
-        (attempt) => setWakingUp(`⏳ Server is waking up... (attempt ${attempt}/3, please wait)`)
+        (attempt, total) => setWakingUp(`⏳ Server is waking up... (attempt ${attempt}/${total}, please wait ~${total * 8}s)`)
       );
       setWakingUp("");
       setRegisteredEmail(form.email);

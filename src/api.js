@@ -5,8 +5,9 @@ const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:8000";
 /**
  * Retries a fetch call up to `retries` times on network failure (e.g. Render cold start).
  * Waits `delayMs` ms between attempts and calls onRetry(attempt) before each retry.
+ * Default: 6 retries × 8s = up to 48s window (covers Render free-tier cold start).
  */
-async function fetchWithRetry(url, options = {}, retries = 3, delayMs = 5000, onRetry = null) {
+async function fetchWithRetry(url, options = {}, retries = 6, delayMs = 8000, onRetry = null) {
   for (let attempt = 1; attempt <= retries + 1; attempt++) {
     try {
       return await fetch(url, options);
@@ -15,12 +16,12 @@ async function fetchWithRetry(url, options = {}, retries = 3, delayMs = 5000, on
       // Firefox "NetworkError when attempting to fetch resource.", CORS failures, etc.)
       const isNetworkError = err instanceof TypeError;
       if (isNetworkError && attempt <= retries) {
-        if (onRetry) onRetry(attempt);
+        if (onRetry) onRetry(attempt, retries);
         await new Promise((res) => setTimeout(res, delayMs));
       } else {
         if (isNetworkError) {
           throw new Error(
-            "Cannot reach the server. It may be starting up — please wait a moment and try again."
+            "Cannot reach the server after several attempts. The backend may be down — please try again in a minute."
           );
         }
         throw err;

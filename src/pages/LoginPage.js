@@ -24,7 +24,7 @@ function LoginPage({ setUser }) {
       const res = await apiLogin(
         username.trim(),
         password,
-        (attempt) => setWakingUp(`⏳ Server is waking up... (attempt ${attempt}/3, please wait)`)
+        (attempt, total) => setWakingUp(`⏳ Server is waking up... (attempt ${attempt}/${total}, please wait ~${total * 8}s)`)
       );
       setWakingUp("");
       const token = res.token;
