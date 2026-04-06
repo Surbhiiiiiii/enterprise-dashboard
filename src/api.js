@@ -11,7 +11,9 @@ async function fetchWithRetry(url, options = {}, retries = 3, delayMs = 5000, on
     try {
       return await fetch(url, options);
     } catch (err) {
-      const isNetworkError = err instanceof TypeError && err.message === "Failed to fetch";
+      // Catch any network-level TypeError (covers Chrome "Failed to fetch",
+      // Firefox "NetworkError when attempting to fetch resource.", CORS failures, etc.)
+      const isNetworkError = err instanceof TypeError;
       if (isNetworkError && attempt <= retries) {
         if (onRetry) onRetry(attempt);
         await new Promise((res) => setTimeout(res, delayMs));
