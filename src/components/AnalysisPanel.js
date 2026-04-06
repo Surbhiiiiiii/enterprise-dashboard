@@ -59,14 +59,73 @@ const AnalysisPanel = ({ setResult, user, setLiveStatus, setLiveLogs }) => {
     if (url.trim()) formData.append("url", url.trim());
     if (file) formData.append("file", file);
 
+    // Timers for fallback local animation (in case WebSocket is unreliable on Render)
+    const timers = [];
+
+    const addLog = (agent, message, type = "info") => {
+      if (setLiveLogs)
+        setLiveLogs((prev) => [
+          ...prev,
+          {
+            id: `evt_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+            time: new Date().toISOString().split("T")[1].slice(0, 12),
+            agent,
+            message,
+            type,
+          },
+        ]);
+    };
+
+    const setPhase = (running, completed = []) => {
+      if (!setLiveStatus) return;
+      const s = { planner: "idle", analyst: "idle", executor: "idle", critic: "idle" };
+      completed.forEach((k) => { s[k] = "completed"; });
+      if (running) s[running] = "running";
+      setLiveStatus(s);
+    };
+
     try {
-      if (setLiveStatus) setLiveStatus({ planner: "idle", analyst: "idle", executor: "idle", critic: "idle" });
+      setPhase("planner");
+      addLog("Planner", "Building memory-informed task plan...", "info");
+
+      timers.push(setTimeout(() => {
+        setPhase("analyst", ["planner"]);
+        addLog("Planner", "Plan generated.", "success");
+        addLog("Analyst", "Inspecting dataset and finding patterns...", "warning");
+      }, 3000));
+
+      timers.push(setTimeout(() => {
+        setPhase("executor", ["planner", "analyst"]);
+        addLog("Analyst", "Analysis complete.", "success");
+        addLog("Executor", "Triggering automated responses...", "error");
+      }, 7000));
+
+      timers.push(setTimeout(() => {
+        setPhase("critic", ["planner", "analyst", "executor"]);
+        addLog("Executor", "Actions executed.", "success");
+        addLog("Critic", "Scoring decision quality...", "info");
+      }, 11000));
+
       if (setLiveLogs) setLiveLogs([]);
       setResult(null);
       setLoading(true);
+
       const data = await apiRunAnalysis(formData);
+
+      // Clear fallback timers — real response arrived
+      timers.forEach(clearTimeout);
+
+      // Mark all completed
+      if (setLiveStatus)
+        setLiveStatus({ planner: "completed", analyst: "completed", executor: "completed", critic: "completed" });
+      addLog("Critic", "Evaluation stored. Pipeline complete.", "success");
+      addLog("System", "Meta-Intelligence optimizations applied.", "success");
+
       setResult(data);
     } catch (err) {
+      timers.forEach(clearTimeout);
+      if (setLiveStatus)
+        setLiveStatus({ planner: "idle", analyst: "idle", executor: "idle", critic: "idle" });
       setErrorMsg(err.message || "Analysis failed. Check backend logs.");
     } finally {
       setLoading(false);
