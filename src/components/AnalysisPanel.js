@@ -16,7 +16,7 @@ const AnalysisPanel = ({ setResult, user, setLiveStatus, setLiveLogs }) => {
   const [url, setUrl] = useState("");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  // const [errorMsg, setErrorMsg] = useState("");
+  const [, setErrorMsg] = useState("");
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [dots, setDots] = useState("");
   const fileInputRef = useRef(null);
