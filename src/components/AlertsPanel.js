@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { apiGetAlerts } from "../api";
+import { apiGetAlerts, apiClearAlerts } from "../api";
 
 const SEVERITY_STYLES = {
   HIGH: {
@@ -48,14 +48,16 @@ function formatTime(ts) {
   }
 }
 
-export default function AlertsPanel({ wsAlert }) {
+export default function AlertsPanel({ wsAlert, user }) {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [unread, setUnread] = useState(0);
   const [expanded, setExpanded] = useState(null);
   const [toast, setToast] = useState(null);
+  const [clearing, setClearing] = useState(false);
   const lastSeenRef = useRef(sessionStorage.getItem("alerts_last_seen") || "");
   const audioCtxRef = useRef(null);
+  const isAdmin = user?.role === "admin";
 
   // ── Fetch alerts ──────────────────────────────────────────────────────────
   const fetchAlerts = useCallback(async () => {
@@ -98,6 +100,21 @@ export default function AlertsPanel({ wsAlert }) {
     sessionStorage.setItem("alerts_last_seen", now);
     lastSeenRef.current = now;
     setUnread(0);
+  };
+
+  // ── Clear all alerts (admin only) ─────────────────────────────────────────
+  const clearAllAlerts = async () => {
+    if (!window.confirm("Delete all alerts from the database? This cannot be undone.")) return;
+    setClearing(true);
+    try {
+      await apiClearAlerts();
+      setAlerts([]);
+      setUnread(0);
+    } catch (err) {
+      alert("Failed to clear alerts: " + err.message);
+    } finally {
+      setClearing(false);
+    }
   };
 
   function playAlertSound() {
@@ -169,6 +186,15 @@ export default function AlertsPanel({ wsAlert }) {
           {unread > 0 && (
             <button onClick={markAllRead} className="text-xs text-cyan-500 hover:text-cyan-300 transition-colors">
               Mark all read
+            </button>
+          )}
+          {isAdmin && alerts.length > 0 && (
+            <button
+              onClick={clearAllAlerts}
+              disabled={clearing}
+              className="text-xs text-red-500 hover:text-red-300 transition-colors disabled:opacity-50"
+            >
+              {clearing ? "Clearing..." : "Clear All"}
             </button>
           )}
         </div>

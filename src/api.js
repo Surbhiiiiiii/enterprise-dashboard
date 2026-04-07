@@ -131,3 +131,13 @@ export async function apiRunAnalysis(formData) {
   if (!res.ok) throw new Error(json.detail || "Analysis failed");
   return json;
 }
+
+export async function apiClearAlerts() {
+  const res = await fetch(`${API_BASE}/admin/clear-alerts`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.detail || "Failed to clear alerts");
+  return json;
+}

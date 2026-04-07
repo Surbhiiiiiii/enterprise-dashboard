@@ -296,7 +296,7 @@ function App() {
                           <div className="lg:col-span-4 flex flex-col gap-6">
                             {/* Alerts Panel */}
                             <div id="alerts" className="glass-panel p-6">
-                              <AlertsPanel wsAlert={wsAlert} />
+                            <AlertsPanel wsAlert={wsAlert} user={user} />
                             </div>
 
                             <div id="activity" className="glass-panel p-6 flex-1 min-h-[300px]">

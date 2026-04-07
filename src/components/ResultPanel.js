@@ -154,18 +154,41 @@ const ResultPanel = ({ result }) => {
         icon={<FaShieldAlt />} 
         glowColor="#06b6d4" /* ai-cyan */
       >
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           <div className="flex justify-between items-center bg-dark-bg/50 rounded-lg p-3 border border-dark-border">
             <span className="text-sm text-gray-400">Decision Score</span>
-            <span className="text-xl font-bold text-ai-cyan drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]">
+            <span className={`text-xl font-bold drop-shadow-[0_0_8px_rgba(6,182,212,0.5)] ${
+              evaluation.decision_score >= 0.7 ? "text-green-400" : 
+              evaluation.decision_score >= 0.5 ? "text-yellow-400" : "text-red-400"
+            }`}>
               {evaluation.decision_score}
             </span>
           </div>
-          
-          <div className="bg-dark-bg/50 rounded-lg p-3 border border-dark-border">
-             <span className="text-xs text-gray-500 block mb-1 uppercase tracking-wide font-semibold">Quality Assessment</span>
-             <p className="text-sm text-gray-300">{evaluation.quality}</p>
+
+          <div className={`rounded-lg p-3 border ${
+            evaluation.quality === "Good" 
+              ? "bg-green-500/5 border-green-500/20" 
+              : "bg-yellow-500/5 border-yellow-500/20"
+          }`}>
+            <span className="text-xs text-gray-500 block mb-1 uppercase tracking-wide font-semibold">Quality</span>
+            <p className={`text-sm font-semibold ${evaluation.quality === "Good" ? "text-green-400" : "text-yellow-400"}`}>
+              {evaluation.quality}
+            </p>
           </div>
+
+          {evaluation.reasoning && (
+            <div className="bg-dark-bg/50 rounded-lg p-3 border border-dark-border">
+              <span className="text-xs text-gray-500 block mb-1 uppercase tracking-wide font-semibold">Reasoning</span>
+              <p className="text-sm text-gray-300 leading-relaxed">{evaluation.reasoning}</p>
+            </div>
+          )}
+
+          {evaluation.feedback_for_planner && (
+            <div className="bg-ai-blue/5 rounded-lg p-3 border border-ai-blue/20">
+              <span className="text-xs text-ai-blue block mb-1 uppercase tracking-wide font-semibold">📌 Feedback for Next Run</span>
+              <p className="text-sm text-gray-300 italic leading-relaxed">{evaluation.feedback_for_planner}</p>
+            </div>
+          )}
         </div>
       </ResultCard>
       )}
